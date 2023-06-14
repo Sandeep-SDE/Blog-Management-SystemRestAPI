@@ -25,7 +25,6 @@ public class Category {
     }
 
     public Category(String name ) {
-        this.id = id;
         this.categoryName = name;
     }
 

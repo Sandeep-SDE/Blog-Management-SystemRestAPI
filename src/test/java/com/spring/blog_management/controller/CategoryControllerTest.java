@@ -4,119 +4,100 @@ import com.spring.blog_management.entity.Category;
 import com.spring.blog_management.service.CategoryService;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
-import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
 import java.net.URI;
 import java.util.Arrays;
 import java.util.List;
-import static org.mockito.Mockito.*;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.when;
+import static org.mockito.ArgumentMatchers.*;
+import static org.mockito.Mockito.*;
 
-@SpringBootTest
 public class CategoryControllerTest {
-
-    @InjectMocks
-    private CategoryController categoryController;
 
     @Mock
     private CategoryService categoryService;
 
+    private CategoryController categoryController;
+
     @BeforeEach
-    public void setUp(){
+    public void setUp() {
         MockitoAnnotations.openMocks(this);
-       // categoryController = new CategoryController(categoryService);
+        categoryController = new CategoryController(categoryService);
     }
 
-    // here the test cases for the controller methods
-
-    /**
-     *      step 1: Create data for mocking
-     *
-     *      step2 : Mock the service method to return the category
-     *
-     *      step3 : Call the controller method
-     *
-     *      step4 : Verify the results by using asserts...
-     */
-
     @Test
-    public void testGetAllCategories(){
+    public void testGetAllCategories() {
         List<Category> categories = Arrays.asList(
-                new Category("firs category"),
-                new Category("second category")
+                new Category("Category 1"),
+                new Category("Category 2")
         );
 
         when(categoryService.getAllCategories()).thenReturn(categories);
 
-        List<Category> returnedCategories = categoryController.getAllCategories();
+        List<Category> result = categoryController.getAllCategories();
 
-        assertNotNull(returnedCategories);
-        assertEquals(categories.size(), returnedCategories.size());
+        assertEquals(categories.size(), result.size());
+        assertEquals(categories.get(0).getCategoryName(), result.get(0).getCategoryName());
+        assertEquals(categories.get(1).getCategoryName(), result.get(1).getCategoryName());
+
+        verify(categoryService, times(1)).getAllCategories();
     }
 
     @Test
-    public void testGetCategoryById(){
-
-        Category category = new Category("category1");
+    public void testGetCategoryById() {
+        Category category = new Category("Category 1");
 
         when(categoryService.getCategoryById(1)).thenReturn(category);
 
-        Category returnedCategory = categoryController.getCategoryById(1);
+        Category result = categoryController.getCategoryById(1);
 
-        assertNotNull(returnedCategory);
-        assertEquals(category.getId(), returnedCategory.getId());
-        assertEquals(category.getCategoryName(), returnedCategory.getCategoryName());
+        assertEquals(category.getCategoryName(), result.getCategoryName());
+
+        verify(categoryService, times(1)).getCategoryById(1);
     }
 
     @Test
-    public void testCreateCategory(){
-
-        Category category = new Category("category1");
-
+    public void testCreateCategory() {
+        Category category = new Category("Category 1");
+        category.setId(1);
         when(categoryService.createCategory(any(Category.class))).thenReturn(category);
 
         ResponseEntity<Category> responseEntity = categoryController.createCategory(category);
 
-        assertNotNull(responseEntity);
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-        assertNotNull(responseEntity.getBody());
-        assertEquals(category.getId(), responseEntity.getBody().getId());
+        assertEquals("/api/categories/1", responseEntity.getHeaders().getLocation().getPath());
         assertEquals(category.getCategoryName(), responseEntity.getBody().getCategoryName());
 
+        verify(categoryService, times(1)).createCategory(any(Category.class));
     }
 
     @Test
     public void testUpdateCategory() {
+        Category category = new Category("Category 1");
 
-        Category category = new Category("Updated Category");
-
+        when(categoryService.getCategoryById(anyInt())).thenReturn(category);
         when(categoryService.updateCategory(any(Category.class))).thenReturn(category);
 
-        Category returnedCategory = categoryController.updateCategory(1, category);
+        Category updatedCategory = new Category("Category 1");
 
-        assertNotNull(returnedCategory);
-        assertEquals(category.getId(), returnedCategory.getId());
-        assertEquals(category.getCategoryName(), returnedCategory.getCategoryName());
+        Category result = categoryController.updateCategory(1, updatedCategory);
+
+        assertEquals(updatedCategory.getCategoryName(), result.getCategoryName());
+
+        verify(categoryService, times(1)).updateCategory(any(Category.class));
     }
 
     @Test
     public void testDeleteCategory() {
-
         ResponseEntity<Void> responseEntity = categoryController.deleteCategory(1);
 
-        assertNotNull(responseEntity);
         assertEquals(HttpStatus.NO_CONTENT, responseEntity.getStatusCode());
+
         verify(categoryService, times(1)).deleteCategory(1);
     }
-
 }
