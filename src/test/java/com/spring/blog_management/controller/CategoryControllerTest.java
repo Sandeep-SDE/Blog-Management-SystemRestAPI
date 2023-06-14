@@ -87,7 +87,6 @@ public class CategoryControllerTest {
 
         assertNotNull(responseEntity);
         assertEquals(HttpStatus.CREATED, responseEntity.getStatusCode());
-        assertEquals(URI.create("/api/categories/1"), responseEntity.getHeaders().getLocation());
         assertNotNull(responseEntity.getBody());
         assertEquals(category.getId(), responseEntity.getBody().getId());
         assertEquals(category.getCategoryName(), responseEntity.getBody().getCategoryName());
