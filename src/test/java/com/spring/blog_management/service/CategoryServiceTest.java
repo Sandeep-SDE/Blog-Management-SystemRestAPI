@@ -1,13 +1,15 @@
 package com.spring.blog_management.service;
 
+
 import com.spring.blog_management.dao.CategoryRepository;
 import com.spring.blog_management.entity.Category;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
@@ -29,11 +31,9 @@ class CategoryServiceTest {
     }
 
     @Test
-    void getAllCategories_ShouldReturnAllCategories() {
+    void testGetAllCategories() {
 
-        List<Category> categories = new ArrayList<>();
-        categories.add(new Category(1, "Category 1"));
-        categories.add(new Category(2, "Category 2"));
+        List<Category> categories = Arrays.asList(new Category("Category1"), new Category("Category2"));
         when(categoryRepository.findAll()).thenReturn(categories);
 
         List<Category> result = categoryService.getAllCategories();
@@ -43,10 +43,10 @@ class CategoryServiceTest {
     }
 
     @Test
-    void getCategoryById_WithExistingId_ShouldReturnCategory() {
+    void testGetCategoryById() {
 
         int categoryId = 1;
-        Category category = new Category(categoryId, "Category 1");
+        Category category = new Category("Category1");
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.of(category));
 
         Category result = categoryService.getCategoryById(categoryId);
@@ -56,7 +56,7 @@ class CategoryServiceTest {
     }
 
     @Test
-    void getCategoryById_WithNonExistingId_ShouldThrowNoSuchElementException() {
+    void testGetCategoryById_NotFound() {
 
         int categoryId = 1;
         when(categoryRepository.findById(categoryId)).thenReturn(Optional.empty());
@@ -66,9 +66,9 @@ class CategoryServiceTest {
     }
 
     @Test
-    void createCategory_ShouldReturnCreatedCategory() {
+    void testCreateCategory() {
 
-        Category category = new Category(1, "Category 1");
+        Category category = new Category("Category1");
         when(categoryRepository.save(category)).thenReturn(category);
 
         Category result = categoryService.createCategory(category);
@@ -78,9 +78,9 @@ class CategoryServiceTest {
     }
 
     @Test
-    void updateCategory_ShouldReturnUpdatedCategory() {
+    void testUpdateCategory() {
 
-        Category category = new Category(1, "Category 1");
+        Category category = new Category("UpdatedCategory");
         when(categoryRepository.save(category)).thenReturn(category);
 
         Category result = categoryService.updateCategory(category);
@@ -90,7 +90,8 @@ class CategoryServiceTest {
     }
 
     @Test
-    void deleteCategory_ShouldInvokeDeleteById() {
+    void testDeleteCategory() {
+        // Arrange
         int categoryId = 1;
 
         categoryService.deleteCategory(categoryId);

@@ -33,7 +33,7 @@ public class Post {
     @JoinColumn(name = "category_id")
     private Category category;
 
-    public Post(int i, String s, String s1){
+    public Post(){
 
     }
 

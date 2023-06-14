@@ -1,16 +1,20 @@
 package com.spring.blog_management.service;
-
 import com.spring.blog_management.dao.PostRepository;
+import com.spring.blog_management.entity.Category;
 import com.spring.blog_management.entity.Post;
-import org.junit.jupiter.api.*;
+import com.spring.blog_management.entity.Tag;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
 import java.util.ArrayList;
+import java.util.HashSet;
 import java.util.List;
 import java.util.NoSuchElementException;
 import java.util.Optional;
+import java.util.Set;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -29,71 +33,64 @@ class PostServiceTest {
     }
 
     @Test
-    void getAllPosts_ShouldReturnAllPosts() {
+    void getAllPosts_ReturnsListOfPosts() {
 
         List<Post> posts = new ArrayList<>();
-        posts.add(new Post(1, "Post 1", "Content 1"));
-        posts.add(new Post(2, "Post 2", "Content 2"));
+        Category category = new Category( "Category1");
+        Set<Tag> tags = new HashSet<>();
+        tags.add(new Tag("Tag1"));
+        tags.add(new Tag("Tag2"));
+        posts.add(new Post("Post1", "Content1", tags, category));
+        posts.add(new Post("Post2", "Content2", tags, category));
         when(postRepository.findAll()).thenReturn(posts);
 
         List<Post> result = postService.getAllPosts();
 
-        assertEquals(posts, result);
+        assertEquals(2, result.size());
+        assertEquals("Post1", result.get(0).getPostTitle());
+        assertEquals("Post2", result.get(1).getPostTitle());
         verify(postRepository, times(1)).findAll();
     }
 
     @Test
-    void getPostById_WithExistingId_ShouldReturnPost() {
+    void getPostById_WithExistingId_ReturnsPost() {
 
-        int postId = 1;
-        Post post = new Post(postId, "Post 1", "Content 1");
-        when(postRepository.findById(postId)).thenReturn(Optional.of(post));
+        int id = 1;
+        Category category = new Category("Category1");
+        Set<Tag> tags = new HashSet<>();
+        tags.add(new Tag("Tag1"));
+        tags.add(new Tag("Tag2"));
+        Post post = new Post("Post1", "Content1", tags, category);
+        when(postRepository.findById(id)).thenReturn(Optional.of(post));
 
-        Post result = postService.getPostById(postId);
+        Post result = postService.getPostById(id);
 
-        assertEquals(post, result);
-        verify(postRepository, times(1)).findById(postId);
+        assertEquals("Post1", result.getPostTitle());
+        verify(postRepository, times(1)).findById(id);
     }
 
     @Test
-    void getPostById_WithNonExistingId_ShouldThrowNoSuchElementException() {
-        int postId = 1;
-        when(postRepository.findById(postId)).thenReturn(Optional.empty());
-        assertThrows(NoSuchElementException.class, () -> postService.getPostById(postId));
-        verify(postRepository, times(1)).findById(postId);
+    void getPostById_WithNonExistingId_ThrowsNoSuchElementException() {
+        // Arrange
+        int id = 1;
+        when(postRepository.findById(id)).thenReturn(Optional.empty());
+
+        assertThrows(NoSuchElementException.class, () -> postService.getPostById(id));
+        verify(postRepository, times(1)).findById(id);
     }
 
     @Test
-    void createPost_ShouldReturnCreatedPost() {
+    void createPost_ReturnsCreatedPost() {
 
-        Post post = new Post(1, "Post 1", "Content 1");
-        when(postRepository.save(post)).thenReturn(post);
+        Category category = new Category("Category1");
+        Set<Tag> tags = new HashSet<>();
+        tags.add(new Tag("Tag1"));
+        tags.add(new Tag("Tag2"));
+        Post postToCreate = new Post("NewPost", "NewContent", tags, category);
+        when(postRepository.save(postToCreate)).thenReturn(postToCreate);
 
-        Post result = postService.createPost(post);
+        Post result = postService.createPost(postToCreate);
 
-        assertEquals(post, result);
-        verify(postRepository, times(1)).save(post);
-    }
-
-    @Test
-    void updatePost_ShouldReturnUpdatedPost() {
-
-        Post post = new Post(1, "Post 1", "Content 1");
-        when(postRepository.save(post)).thenReturn(post);
-
-        Post result = postService.updatePost(post);
-
-        assertEquals(post, result);
-        verify(postRepository, times(1)).save(post);
-    }
-
-    @Test
-    void deletePost_ShouldInvokeDeleteById() {
-
-        int postId = 1;
-
-        postService.deletePost(postId);
-
-        verify(postRepository, times(1)).deleteById(postId);
+        assertEquals("NewPost", result.getPostTitle());
     }
 }

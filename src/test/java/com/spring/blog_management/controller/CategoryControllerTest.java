@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
+import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 
@@ -21,6 +22,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.when;
 
+@SpringBootTest
 public class CategoryControllerTest {
 
     @InjectMocks
@@ -50,8 +52,8 @@ public class CategoryControllerTest {
     @Test
     public void testGetAllCategories(){
         List<Category> categories = Arrays.asList(
-                new Category(1,"firs category"),
-                new Category(2, "second category")
+                new Category("firs category"),
+                new Category("second category")
         );
 
         when(categoryService.getAllCategories()).thenReturn(categories);
@@ -65,7 +67,7 @@ public class CategoryControllerTest {
     @Test
     public void testGetCategoryById(){
 
-        Category category = new Category(1, "category1");
+        Category category = new Category("category1");
 
         when(categoryService.getCategoryById(1)).thenReturn(category);
 
@@ -79,7 +81,7 @@ public class CategoryControllerTest {
     @Test
     public void testCreateCategory(){
 
-        Category category = new Category(1, "category1");
+        Category category = new Category("category1");
 
         when(categoryService.createCategory(any(Category.class))).thenReturn(category);
 
@@ -96,7 +98,7 @@ public class CategoryControllerTest {
     @Test
     public void testUpdateCategory() {
 
-        Category category = new Category(1, "Updated Category");
+        Category category = new Category("Updated Category");
 
         when(categoryService.updateCategory(any(Category.class))).thenReturn(category);
 
