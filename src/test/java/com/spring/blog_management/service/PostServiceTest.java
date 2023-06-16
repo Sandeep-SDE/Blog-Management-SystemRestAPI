@@ -9,12 +9,7 @@ import org.mockito.InjectMocks;
 import org.mockito.Mock;
 import org.mockito.MockitoAnnotations;
 
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.NoSuchElementException;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.Mockito.*;
@@ -80,6 +75,22 @@ class PostServiceTest {
     }
 
     @Test
+    void testUpdatePost() {
+        // Arrange
+        Category category = new Category("Category 1");
+        Tag tag = new Tag("Tag 1");
+        Set<Tag> tags = new HashSet<>(Collections.singletonList(tag));
+        Post post = new Post("Updated Title", "Updated Content", tags, category);
+
+        when(postRepository.save(post)).thenReturn(post);
+
+        Post result = postService.updatePost(post);
+
+        assertEquals(post, result);
+        verify(postRepository, times(1)).save(post);
+    }
+
+    @Test
     void createPost_ReturnsCreatedPost() {
 
         Category category = new Category("Category1");
@@ -92,5 +103,14 @@ class PostServiceTest {
         Post result = postService.createPost(postToCreate);
 
         assertEquals("NewPost", result.getPostTitle());
+    }
+
+    @Test
+    void testDeletePost() {
+        int postId = 1;
+
+        postService.deletePost(postId);
+
+        verify(postRepository, times(1)).deleteById(postId);
     }
 }
